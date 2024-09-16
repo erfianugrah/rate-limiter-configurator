@@ -1,0 +1,231 @@
+---
+import { LABELS, FINGERPRINT_PARAMS, REQUEST_MATCH_FIELDS, REQUEST_MATCH_OPERATORS, LOGICAL_OPERATORS } from '../scripts/config-variables';
+import RuleCondition from './RuleCondition.astro';
+
+export interface Props {
+  rule?: any;
+  index: number;
+}
+
+const { rule = {}, index } = Astro.props;
+
+// Ensure rateLimit object exists
+const rateLimit = rule.rateLimit || { limit: '', period: '' };
+
+// Ensure action object exists
+const action = rule.action || { type: 'rateLimit' };
+
+// Ensure requestMatch object exists
+const requestMatch = rule.requestMatch || { conditions: [] };
+---
+
+<div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" data-rule-index={index}>
+  <h3 class="text-lg font-semibold text-gray-800 mb-4">Rule {index + 1}</h3>
+  
+  <input type="hidden" name={`rules[${index}].order`} value={index + 1}>
+  
+  <div class="mb-4">
+    <label class="block text-gray-700 text-sm font-bold mb-2" for={`ruleName${index}`}>
+      {LABELS.RULE_NAME}
+    </label>
+    <input 
+      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+      id={`ruleName${index}`} 
+      name={`rules[${index}].name`} 
+      type="text" 
+      value={rule.name || ''} 
+      required
+    >
+  </div>
+
+  <div class="mb-4">
+    <label class="block text-gray-700 text-sm font-bold mb-2" for={`ruleDescription${index}`}>
+      {LABELS.DESCRIPTION}
+    </label>
+    <textarea 
+      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+      id={`ruleDescription${index}`} 
+      name={`rules[${index}].description`}
+    >{rule.description || ''}</textarea>
+  </div>
+
+  <div class="mb-4">
+    <h4 class="text-md font-semibold mb-2">Rate Limit</h4>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-gray-700 text-sm font-bold mb-2" for={`limit${index}`}>
+          {LABELS.REQUEST_LIMIT}
+        </label>
+        <input 
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+          id={`limit${index}`} 
+          name={`rules[${index}].rateLimit.limit`} 
+          type="number" 
+          value={rateLimit.limit} 
+          required
+        >
+      </div>
+      <div>
+        <label class="block text-gray-700 text-sm font-bold mb-2" for={`period${index}`}>
+          {LABELS.TIME_PERIOD}
+        </label>
+        <input 
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+          id={`period${index}`} 
+          name={`rules[${index}].rateLimit.period`} 
+          type="number" 
+          value={rateLimit.period} 
+          required
+        >
+      </div>
+    </div>
+  </div>
+
+<div class="mb-4">
+  <h4 class="text-md font-semibold mb-2">{LABELS.REQUEST_MATCH}</h4>
+  <div id={`requestMatchConditions${index}`}>
+    {requestMatch.conditions.map((condition, condIndex) => (
+      <>
+        {condIndex > 0 && (
+          <div class="flex justify-end items-center my-4">
+            <select class="operator-select w-auto px-3 py-1 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md" name={`rules[${index}].requestMatch.conditions[${condIndex - 1}].operator`}>
+              {LOGICAL_OPERATORS.map((op) => (
+                <option value={op.value} selected={condition.operator === op.value}>{op.label}</option>
+              ))}
+            </select>
+          </div>
+        )}
+        {condition.type === 'group' ? (
+          <div class="condition-group border-2 border-gray-300 rounded-lg p-4 mb-4 bg-white" id={`group${index}_${condIndex}`}>
+            <div class="flex justify-between items-center mb-4">
+              <h5 class="text-lg font-semibold text-gray-700">Condition Group</h5>
+              <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onclick={`removeConditionGroup(${index}, ${condIndex})`}>
+                Remove Group
+              </button>
+            </div>
+            <div id={`groupConditions${index}_${condIndex}`}>
+              {condition.conditions.map((groupCondition, groupCondIndex) => (
+                <>
+                  {groupCondIndex > 0 && (
+                    <div class="flex justify-end items-center my-4">
+                      <select class="operator-select w-auto px-3 py-1 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md" name={`rules[${index}].requestMatch.conditions[${condIndex}].conditions[${groupCondIndex - 1}].operator`}>
+                        {LOGICAL_OPERATORS.map((op) => (
+                          <option value={op.value} selected={groupCondition.operator === op.value}>{op.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  <RuleCondition ruleIndex={index} conditionIndex={`${condIndex}_${groupCondIndex}`} condition={groupCondition} isGroupCondition={true} />
+                </>
+              ))}
+            </div>
+            <div class="mt-4">
+              <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onclick={`addConditionToGroup(${index}, ${condIndex})`}>
+                Add Condition to Group
+              </button>
+            </div>
+          </div>
+        ) : (
+          <RuleCondition ruleIndex={index} conditionIndex={condIndex} condition={condition} />
+        )}
+      </>
+    ))}
+  </div>
+  <div class="mt-4">
+    <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" onclick={`addCondition(${index})`}>
+      Add Condition
+    </button>
+    <button type="button" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onclick={`addConditionGroup(${index})`}>
+      Add Condition Group
+    </button>
+  </div>
+</div>
+
+  <div class="mb-6">
+    <h4 class="text-md font-semibold mb-2">Action</h4>
+    <div class="inline-block bg-gray-50 p-4 rounded-md shadow-sm">
+      <div class="mb-4 max-w-md">
+        <label class="block text-sm font-medium text-gray-700 mb-1" for={`actionType${index}`}>
+          Action Type
+        </label>
+        <select 
+          id={`actionType${index}`} 
+          name={`rules[${index}].action.type`} 
+          class="w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm"
+        >
+          <option value="log" selected={action.type === 'log'}>Log</option>
+          <option value="simulate" selected={action.type === 'simulate'}>Simulate</option>
+          <option value="block" selected={action.type === 'block'}>Block (403)</option>
+          <option value="rateLimit" selected={action.type === 'rateLimit'}>Rate Limit (429)</option>
+          <option value="customResponse" selected={action.type === 'customResponse'}>Custom JSON Response</option>
+        </select>
+      </div>
+      <div id={`actionFields${index}`} class="space-y-4">
+        <!-- Additional action fields will be dynamically added here -->
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <h4 class="text-md font-semibold mb-2">{LABELS.FINGERPRINT_PARAMS}</h4>
+    <div class="bg-gray-50 p-4 rounded-md shadow-sm">
+      <div class="flex flex-wrap items-end space-x-4 mb-4">
+        <div class="flex-grow max-w-md">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Parameter Type</label>
+          <select id={`fingerprintParam${index}`} class="w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
+            {FINGERPRINT_PARAMS.map((param) => (
+              <option value={param.value}>{param.label}</option>
+            ))}
+          </select>
+        </div>
+        <div id={`fingerprintAdditionalFields${index}`} class="flex-grow">
+          <!-- Additional fields will be dynamically added here -->
+        </div>
+        <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline shadow-md" onclick={`addFingerprint(${index})`}>
+          Add Parameter
+        </button>
+      </div>
+      <div id={`fingerprintList${index}`} class="mt-4 p-2 border rounded min-h-[100px] shadow-inner bg-white">
+        {rule.fingerprint && rule.fingerprint.parameters && rule.fingerprint.parameters.map((param) => (
+          <div class="flex justify-between items-center mb-2 p-2 bg-gray-100 rounded">
+            <span>{param}</span>
+            <input type="hidden" name={`rules[${index}].fingerprint.parameters[]`} value={param}>
+            <button type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs" onclick="removeFingerprint(this.parentNode)">Remove</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { initializeFormInteractivity, updateActionFields } from '../scripts/form-interactivity';
+  import { addCondition, addConditionGroup, addConditionToGroup, removeCondition, removeConditionGroup } from '../scripts/rule-form-actions';
+  import { addFingerprint, removeFingerprint } from '../scripts/fingerprint-utils';
+  import { createOperator } from '../scripts/request-match-utils';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeFormInteractivity();
+
+    document.querySelectorAll('[data-rule-index]').forEach(form => {
+      const index = form.dataset.ruleIndex;
+
+      form.querySelector(`[name="rules[${index}].action.type"]`).addEventListener('change', (e) => {
+        updateActionFields(index, e.target.value);
+      });
+
+      // Initialize action fields
+      updateActionFields(index, form.querySelector(`[name="rules[${index}].action.type"]`).value);
+    });
+
+    // Make functions globally available
+    window.addCondition = addCondition;
+    window.addConditionGroup = addConditionGroup;
+    window.addConditionToGroup = addConditionToGroup;
+    window.removeCondition = removeCondition;
+    window.removeConditionGroup = removeConditionGroup;
+    window.addFingerprint = addFingerprint;
+    window.removeFingerprint = removeFingerprint;
+    window.createOperator = createOperator;
+  });
+</script>

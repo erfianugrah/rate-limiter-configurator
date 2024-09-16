@@ -1,0 +1,98 @@
+---
+import { LABELS, REQUEST_MATCH_FIELDS, REQUEST_MATCH_OPERATORS } from '../scripts/config-variables';
+
+export interface Props {
+  ruleIndex: number;
+  conditionIndex: number;
+  condition?: any;
+  isGroupCondition?: boolean;
+}
+
+const { ruleIndex, conditionIndex, condition = {}, isGroupCondition = false } = Astro.props;
+
+const namePrefix = isGroupCondition
+  ? `rules[${ruleIndex}].requestMatch.conditions[${conditionIndex.split('_')[0]}].conditions[${conditionIndex.split('_')[1]}]`
+  : `rules[${ruleIndex}].requestMatch.conditions[${conditionIndex}]`;
+---
+
+<div class="condition-field bg-gray-50 p-4 rounded-md shadow-sm mb-6" id={`condition${ruleIndex}_${conditionIndex}`} role="group" aria-labelledby={`condition-label-${ruleIndex}-${conditionIndex}`}>
+  <h4 id={`condition-label-${ruleIndex}-${conditionIndex}`} class="sr-only">Condition {conditionIndex + 1}</h4>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1" for={`${namePrefix}.field`}>{LABELS.CONDITION_FIELD}</label>
+<select
+        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+        name={`${namePrefix}.field`}
+        id={`${namePrefix}.field`}
+        required
+        aria-describedby={`${namePrefix}.field-error`}
+      >
+        {REQUEST_MATCH_FIELDS.map((field) => (
+          <option value={field.value} selected={condition.field === field.value}>{field.label}</option>
+        ))}
+      </select>
+      <p id={`${namePrefix}.field-error`} class="error-message text-red-500 text-xs italic mt-1" aria-live="polite"></p>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1" for={`${namePrefix}.comparator`}>{LABELS.CONDITION_OPERATOR}</label>
+      <select
+        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+        name={`${namePrefix}.comparator`}
+        id={`${namePrefix}.comparator`}
+        required
+        aria-describedby={`${namePrefix}.comparator-error`}
+      >
+        {REQUEST_MATCH_OPERATORS.map((op) => (
+          <option value={op.value} selected={condition.comparator === op.value}>{op.label}</option>
+        ))}
+      </select>
+      <p id={`${namePrefix}.comparator-error`} class="error-message text-red-500 text-xs italic mt-1" aria-live="polite"></p>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1" for={`${namePrefix}.value`}>{LABELS.CONDITION_VALUE}</label>
+      <input
+        class="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+        name={`${namePrefix}.value`}
+        id={`${namePrefix}.value`}
+        type="text"
+        value={condition.value || ''}
+        required
+        aria-describedby={`${namePrefix}.value-error`}
+      />
+      <p id={`${namePrefix}.value-error`} class="error-message text-red-500 text-xs italic mt-1" aria-live="polite"></p>
+    </div>
+  </div>
+  <div class="mt-4 text-right">
+    <button
+      type="button"
+      class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+      data-action="remove-condition"
+      data-rule-index={ruleIndex}
+      data-condition-index={conditionIndex}
+      aria-label={`Remove condition ${conditionIndex + 1}`}
+    >
+      Remove
+    </button>
+  </div>
+</div>
+
+<script>
+  import { updateConditionFields } from '../scripts/request-match-utils';
+  import { removeCondition } from '../scripts/rule-form-actions';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[name$=".field"]').forEach(select => {
+      select.addEventListener('change', (e) => {
+        const [ruleIndex, conditionIndex] = e.target.id.match(/\d+/g);
+        updateConditionFields(e.target, ruleIndex, conditionIndex);
+      });
+    });
+
+    document.querySelectorAll('[data-action="remove-condition"]').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const { ruleIndex, conditionIndex } = e.target.dataset;
+        removeCondition(ruleIndex, conditionIndex);
+      });
+    });
+  });
+</script>
