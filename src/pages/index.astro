@@ -2,8 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import RuleForm from '../components/RuleForm.astro';
 import RuleModal from '../components/RuleModal.astro';
-import { loadConfiguration } from '../scripts/config-loader';
-import { API_ENDPOINTS } from '../scripts/config-variables';
+import { loadConfiguration } from '../scripts/config-loader.js';
+import { API_ENDPOINTS } from '../scripts/config-variables.js';
 
 let config;
 try {
@@ -58,8 +58,8 @@ const rules = config.rules || [];
 </script>
 
 <script>
-  import { initializeUI } from '../scripts/ui-initializer';
-  import '../scripts/config-ui';
+  import { initializeUI } from '../scripts/ui-initializer.js';
+  import '../scripts/config-ui.js';
 
   document.addEventListener('DOMContentLoaded', () => {
     initializeUI();

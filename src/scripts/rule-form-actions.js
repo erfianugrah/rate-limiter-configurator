@@ -1,4 +1,8 @@
-import { createConditionFields, createConditionGroup, createOperator } from './request-match-utils';
+import {
+  createConditionFields,
+  createConditionGroup,
+  createOperator,
+} from './request-match-utils.js';
 
 export function addCondition(ruleIndex) {
   const conditionsContainer = document.getElementById(`requestMatchConditions${ruleIndex}`);

@@ -1,5 +1,5 @@
 ---
-import { LABELS, REQUEST_MATCH_FIELDS, REQUEST_MATCH_OPERATORS } from '../scripts/config-variables';
+import { LABELS, REQUEST_MATCH_FIELDS, REQUEST_MATCH_OPERATORS } from '../scripts/config-variables.js';
 
 export interface Props {
   ruleIndex: number;
@@ -77,8 +77,8 @@ const namePrefix = isGroupCondition
 </div>
 
 <script>
-  import { updateConditionFields } from '../scripts/request-match-utils';
-  import { removeCondition } from '../scripts/rule-form-actions';
+  import { updateConditionFields } from '../scripts/request-match-utils.js';
+  import { removeCondition } from '../scripts/rule-form-actions.js';
 
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[name$=".field"]').forEach(select => {

@@ -1,5 +1,5 @@
-import { updateRuleModals } from './rule-forms';
-import { MESSAGES } from './config-variables';
+import { updateRuleModals } from './rule-forms.js';
+import { MESSAGES } from './config-variables.js';
 
 // Initialize currentRules as an empty array
 window.currentRules = [];

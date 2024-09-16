@@ -1,4 +1,4 @@
-import { API_ENDPOINTS, MESSAGES } from './config-variables';
+import { API_ENDPOINTS, MESSAGES } from './config-variables.js';
 
 export async function saveConfiguration() {
   try {

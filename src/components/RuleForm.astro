@@ -1,5 +1,5 @@
 ---
-import { LABELS, FINGERPRINT_PARAMS, REQUEST_MATCH_FIELDS, REQUEST_MATCH_OPERATORS, LOGICAL_OPERATORS } from '../scripts/config-variables';
+import { LABELS, FINGERPRINT_PARAMS, REQUEST_MATCH_FIELDS, REQUEST_MATCH_OPERATORS, LOGICAL_OPERATORS } from '../scripts/config-variables.js';
 import RuleCondition from './RuleCondition.astro';
 
 export interface Props {
@@ -38,7 +38,7 @@ const requestMatch = rule.requestMatch || { conditions: [] };
     >
   </div>
 
-  <div class="mb-4">
+ <div class="mb-4">
     <label class="block text-gray-700 text-sm font-bold mb-2" for={`ruleDescription${index}`}>
       {LABELS.DESCRIPTION}
     </label>
