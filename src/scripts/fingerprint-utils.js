@@ -69,3 +69,47 @@ export function addToList(list, value, ruleIndex) {
   item.querySelector('span').onmouseenter = () => tooltip.classList.remove('hidden');
   item.querySelector('span').onmouseleave = () => tooltip.classList.add('hidden');
 }
+
+export function updateFingerprintFields(ruleIndex) {
+  const selectedType = document.getElementById(`fingerprintParam${ruleIndex}`).value;
+  const additionalFieldsContainer = document.getElementById(
+    `fingerprintAdditionalFields${ruleIndex}`
+  );
+
+  let additionalFieldsHTML = '';
+
+  const inputClasses =
+    'w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm bg-white';
+
+  if (selectedType === 'headers.name' || selectedType === 'headers.nameValue') {
+    additionalFieldsHTML += `
+      <div class="flex space-x-2">
+        <div class="flex-grow">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Header Name</label>
+          <input type="text" id="headerName${ruleIndex}" class="${inputClasses}">
+        </div>
+    `;
+
+    if (selectedType === 'headers.nameValue') {
+      additionalFieldsHTML += `
+        <div class="flex-grow">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Header Value</label>
+          <input type="text" id="headerValue${ruleIndex}" class="${inputClasses}">
+        </div>
+      `;
+    }
+
+    additionalFieldsHTML += `</div>`;
+  } else if (selectedType === 'body' || selectedType === 'body.custom') {
+    additionalFieldsHTML += `
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          ${selectedType === 'body' ? 'Request Body' : 'Body Field (JSON path)'}
+        </label>
+        <input type="text" id="bodyField${ruleIndex}" class="${inputClasses}">
+      </div>
+    `;
+  }
+
+  additionalFieldsContainer.innerHTML = additionalFieldsHTML;
+}

@@ -32,7 +32,7 @@ export function initializeUI() {
       updateRuleModals();
       ruleModals.classList.remove('hidden');
       addNewRuleBtn.classList.remove('hidden');
-      configForm.classList.add('hidden');
+      // configForm.classList.add('hidden');
     } catch (error) {
       const messageEl = document.getElementById('message');
       messageEl.textContent = MESSAGES.SAVE_ERROR + error.message;

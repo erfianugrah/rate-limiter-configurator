@@ -6,7 +6,7 @@ import {
 } from './config-variables.js';
 import { populateConditions } from './request-match-utils.js';
 import { updateActionFields } from './action-utils.js';
-import { addToList } from './fingerprint-utils.js';
+import { addToList, updateFingerprintFields } from './fingerprint-utils.js';
 
 export function createRuleForm(rule = {}, editIndex = null) {
   console.log('Creating rule form:', rule);
