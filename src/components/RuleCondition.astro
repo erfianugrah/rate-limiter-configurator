@@ -3,20 +3,25 @@ import { LABELS, REQUEST_MATCH_FIELDS, REQUEST_MATCH_OPERATORS } from '../script
 
 export interface Props {
   ruleIndex: number;
-  conditionIndex: number;
+  conditionIndex: string | number;
   condition?: any;
   isGroupCondition?: boolean;
 }
 
 const { ruleIndex, conditionIndex, condition = {}, isGroupCondition = false } = Astro.props;
 
+const stringConditionIndex = typeof conditionIndex === 'number' ? conditionIndex.toString() : conditionIndex;
+const [groupIndex, innerIndex] = stringConditionIndex.split('_');
+
 const namePrefix = isGroupCondition
-  ? `rules[${ruleIndex}].requestMatch.conditions[${conditionIndex.split('_')[0]}].conditions[${conditionIndex.split('_')[1]}]`
-  : `rules[${ruleIndex}].requestMatch.conditions[${conditionIndex}]`;
+  ? `rules[${ruleIndex}].requestMatch.conditions[${groupIndex}].conditions[${innerIndex}]`
+  : `rules[${ruleIndex}].requestMatch.conditions[${stringConditionIndex}]`;
 ---
 
 <div class="condition-field bg-gray-50 p-4 rounded-md shadow-sm mb-6" id={`condition${ruleIndex}_${conditionIndex}`} role="group" aria-labelledby={`condition-label-${ruleIndex}-${conditionIndex}`}>
-  <h4 id={`condition-label-${ruleIndex}-${conditionIndex}`} class="sr-only">Condition {conditionIndex + 1}</h4>
+<h4 id={`condition-label-${ruleIndex}-${conditionIndex}`} class="sr-only">
+  Condition {typeof conditionIndex === 'number' ? conditionIndex + 1 : parseInt(conditionIndex) + 1}
+</h4>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1" for={`${namePrefix}.field`}>{LABELS.CONDITION_FIELD}</label>
@@ -63,14 +68,14 @@ const namePrefix = isGroupCondition
     </div>
   </div>
   <div class="mt-4 text-right">
-    <button
-      type="button"
-      class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-      data-action="remove-condition"
-      data-rule-index={ruleIndex}
-      data-condition-index={conditionIndex}
-      aria-label={`Remove condition ${conditionIndex + 1}`}
-    >
+<button
+  type="button"
+  class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+  data-action="remove-condition"
+  data-rule-index={ruleIndex}
+  data-condition-index={conditionIndex}
+  aria-label={`Remove condition ${typeof conditionIndex === 'number' ? conditionIndex + 1 : parseInt(conditionIndex) + 1}`}
+>
       Remove
     </button>
   </div>
@@ -80,19 +85,24 @@ const namePrefix = isGroupCondition
   import { updateConditionFields } from '../scripts/request-match-utils.js';
   import { removeCondition } from '../scripts/rule-form-actions.js';
 
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[name$=".field"]').forEach(select => {
-      select.addEventListener('change', (e) => {
-        const [ruleIndex, conditionIndex] = e.target.id.match(/\d+/g);
-        updateConditionFields(e.target, ruleIndex, conditionIndex);
-      });
-    });
-
-    document.querySelectorAll('[data-action="remove-condition"]').forEach(button => {
-      button.addEventListener('click', (e) => {
-        const { ruleIndex, conditionIndex } = e.target.dataset;
-        removeCondition(ruleIndex, conditionIndex);
-      });
-    });
+document.querySelectorAll('[name$=".field"]').forEach(select => {
+  select.addEventListener('change', (e) => {
+    const target = e.target as HTMLSelectElement;
+    const [ruleIndex, conditionIndex] = target.id.match(/\d+/g) || [];
+    if (ruleIndex && conditionIndex) {
+      updateConditionFields(target, parseInt(ruleIndex), conditionIndex);
+    }
   });
+});
+
+document.querySelectorAll('[data-action="remove-condition"]').forEach(button => {
+  button.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const ruleIndex = target.dataset.ruleIndex;
+    const conditionIndex = target.dataset.conditionIndex;
+    if (ruleIndex && conditionIndex) {
+      removeCondition(parseInt(ruleIndex), conditionIndex);
+    }
+  });
+});
 </script>

@@ -90,7 +90,7 @@ export function createOperator(namePrefix, selectedOperator = 'and') {
   `;
 }
 
-export function createConditionGroup(ruleIndex, groupIndex, group = {}) {
+export function createConditionGroup(ruleIndex, groupIndex) {
   const groupId = `group${ruleIndex}_${groupIndex}`;
   return `
     <div class="condition-group border-2 border-gray-300 rounded-lg p-4 mb-4 bg-white" id="${groupId}">

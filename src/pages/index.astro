@@ -2,16 +2,9 @@
 import Layout from '../layouts/Layout.astro';
 import RuleForm from '../components/RuleForm.astro';
 import RuleModal from '../components/RuleModal.astro';
-import { loadConfiguration } from '../scripts/config-loader.js';
-import { API_ENDPOINTS } from '../scripts/config-variables.js';
+import { loadConfiguration } from '../scripts/config-loader';
 
-let config;
-try {
-  config = await loadConfiguration(API_ENDPOINTS.CONFIG);
-} catch (error) {
-  console.error('Error loading configuration:', error);
-  config = { rules: [] };
-}
+const config = await loadConfiguration();
 const rules = config.rules || [];
 ---
 
@@ -25,58 +18,32 @@ const rules = config.rules || [];
       ))}
     </div>
 
-    <button id="addNewRule" class="mb-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+    <button id="addNewRule" class="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
       Add New Rule
     </button>
 
-    <div id="rulesContainer" class="space-y-4">
-      {rules.map((rule, index) => (
-        <RuleForm rule={rule} index={index} />
-      ))}
-    </div>
-
-    <div id="newRuleContainer" class="hidden space-y-4">
-      <RuleForm index={rules.length} />
+    <div id="rulesContainer" class="space-y-4 hidden">
+      <!-- Rule forms will be dynamically inserted here -->
     </div>
 
     <div class="mt-6 flex justify-end space-x-4">
-      <button id="cancelEdit" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+      <button id="cancelEdit" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
         Cancel
       </button>
-      <button id="saveConfig" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+      <button id="saveConfig" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
         Save Configuration
       </button>
     </div>
+
     <div id="message" class="mt-4 text-center font-bold"></div>
   </main>
 </Layout>
 
-<script define:vars={{ initialRules: rules }}>
-  // Initialize currentRules with the server-side loaded data
+<script is:inline define:vars={{ initialRules: rules }}>
   window.currentRules = initialRules;
 </script>
 
 <script>
-  import { initializeUI } from '../scripts/ui-initializer.js';
-  import '../scripts/config-ui.js';
-
-  document.addEventListener('DOMContentLoaded', () => {
-    initializeUI();
-
-    const addNewRuleButton = document.getElementById('addNewRule');
-    const rulesContainer = document.getElementById('rulesContainer');
-    const newRuleContainer = document.getElementById('newRuleContainer');
-
-    addNewRuleButton.addEventListener('click', () => {
-      rulesContainer.classList.add('hidden');
-      newRuleContainer.classList.remove('hidden');
-      addNewRuleButton.classList.add('hidden');
-    });
-
-    document.getElementById('cancelEdit').addEventListener('click', () => {
-      rulesContainer.classList.remove('hidden');
-      newRuleContainer.classList.add('hidden');
-      addNewRuleButton.classList.remove('hidden');
-    });
-  });
+  import { initializeUI } from '../scripts/ui-initializer';
+  document.addEventListener('DOMContentLoaded', initializeUI);
 </script>

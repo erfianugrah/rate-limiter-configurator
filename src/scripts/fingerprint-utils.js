@@ -1,4 +1,4 @@
-import { FINGERPRINT_PARAMS, FINGERPRINT_TOOLTIPS } from './config-variables.js';
+import { FINGERPRINT_TOOLTIPS } from './config-variables.js';
 
 export function addFingerprint(ruleIndex) {
   const select = document.getElementById(`fingerprintParam${ruleIndex}`);

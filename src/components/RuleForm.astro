@@ -1,5 +1,5 @@
 ---
-import { LABELS, FINGERPRINT_PARAMS, REQUEST_MATCH_FIELDS, REQUEST_MATCH_OPERATORS, LOGICAL_OPERATORS } from '../scripts/config-variables.js';
+import { LABELS, FINGERPRINT_PARAMS, LOGICAL_OPERATORS } from '../scripts/config-variables.js';
 import RuleCondition from './RuleCondition.astro';
 
 export interface Props {
@@ -84,7 +84,7 @@ const requestMatch = rule.requestMatch || { conditions: [] };
 <div class="mb-4">
   <h4 class="text-md font-semibold mb-2">{LABELS.REQUEST_MATCH}</h4>
   <div id={`requestMatchConditions${index}`}>
-    {requestMatch.conditions.map((condition, condIndex) => (
+    {requestMatch.conditions.map((condition: any, condIndex: number) => (
       <>
         {condIndex > 0 && (
           <div class="flex justify-end items-center my-4">
@@ -104,7 +104,7 @@ const requestMatch = rule.requestMatch || { conditions: [] };
               </button>
             </div>
             <div id={`groupConditions${index}_${condIndex}`}>
-              {condition.conditions.map((groupCondition, groupCondIndex) => (
+              {condition.conditions.map((groupCondition: any, groupCondIndex: number) => (
                 <>
                   {groupCondIndex > 0 && (
                     <div class="flex justify-end items-center my-4">
@@ -186,7 +186,7 @@ const requestMatch = rule.requestMatch || { conditions: [] };
         </button>
       </div>
       <div id={`fingerprintList${index}`} class="mt-4 p-2 border rounded min-h-[100px] shadow-inner bg-white">
-        {rule.fingerprint && rule.fingerprint.parameters && rule.fingerprint.parameters.map((param) => (
+        {rule.fingerprint && rule.fingerprint.parameters && rule.fingerprint.parameters.map((param: string) => (
           <div class="flex justify-between items-center mb-2 p-2 bg-gray-100 rounded">
             <span>{param}</span>
             <input type="hidden" name={`rules[${index}].fingerprint.parameters[]`} value={param}>
@@ -207,16 +207,19 @@ const requestMatch = rule.requestMatch || { conditions: [] };
   document.addEventListener('DOMContentLoaded', () => {
     initializeFormInteractivity();
 
-    document.querySelectorAll('[data-rule-index]').forEach(form => {
-      const index = form.dataset.ruleIndex;
-
-      form.querySelector(`[name="rules[${index}].action.type"]`).addEventListener('change', (e) => {
-        updateActionFields(index, e.target.value);
-      });
-
-      // Initialize action fields
-      updateActionFields(index, form.querySelector(`[name="rules[${index}].action.type"]`).value);
+document.querySelectorAll('[data-rule-index]').forEach(form => {
+  const index = (form as HTMLElement).dataset.ruleIndex;
+  if (index) {
+    const actionTypeSelect = form.querySelector(`[name="rules[${index}].action.type"]`) as HTMLSelectElement;
+    
+    actionTypeSelect.addEventListener('change', (e) => {
+      updateActionFields(parseInt(index), (e.target as HTMLSelectElement).value);
     });
+
+    // Initialize action fields
+    updateActionFields(parseInt(index), actionTypeSelect.value);
+  }
+});
 
     // Make functions globally available
     window.addCondition = addCondition;

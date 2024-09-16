@@ -1,9 +1,4 @@
-import {
-  LABELS,
-  FINGERPRINT_PARAMS,
-  REQUEST_MATCH_FIELDS,
-  REQUEST_MATCH_OPERATORS,
-} from './config-variables.js';
+import { LABELS, FINGERPRINT_PARAMS } from './config-variables.js';
 import { populateConditions } from './request-match-utils.js';
 import { updateActionFields } from './action-utils.js';
 import { addToList, updateFingerprintFields } from './fingerprint-utils.js';
@@ -233,7 +228,7 @@ function serializeRuleForm(form) {
 
 export function initializeRuleForm() {
   console.log('Initializing rule form');
-  document.getElementById('configForm').onsubmit = async (e) => {
+  document.getElementById('configForm').onsubmit = (e) => {
     e.preventDefault();
     console.log('Form submitted');
     const newRule = serializeRuleForm(e.target);
@@ -249,7 +244,7 @@ export function initializeRuleForm() {
     }
     try {
       console.log('Saving configuration');
-      await saveConfiguration();
+      saveConfiguration();
       console.log('Configuration saved successfully');
       updateRuleModals();
     } catch (error) {
