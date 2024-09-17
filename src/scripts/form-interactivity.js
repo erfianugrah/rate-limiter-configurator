@@ -35,7 +35,7 @@ function validateRequiredField(field) {
 export function updateActionFields(ruleIndex, actionType) {
   const actionFields = document.getElementById(`actionFields${ruleIndex}`);
   const inputClasses =
-    'mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md';
+    'mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md';
 
   let fieldsHTML = '';
   switch (actionType) {

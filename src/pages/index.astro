@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import RuleForm from '../components/RuleForm.astro';
 import RuleModal from '../components/RuleModal.astro';
+import RuleForm from '../components/RuleForm.astro';
 import { loadConfiguration } from '../scripts/config-loader';
 
 const config = await loadConfiguration();
@@ -22,28 +22,34 @@ const rules = config.rules || [];
       Add New Rule
     </button>
 
-    <div id="rulesContainer" class="space-y-4 hidden">
-      <!-- Rule forms will be dynamically inserted here -->
-    </div>
+    <div id="configFormContainer" class="hidden">
+      <form id="configForm" class="space-y-4">
+        <div id="rulesContainer">
+          <!-- Rule forms will be dynamically inserted here -->
+        </div>
 
-    <div class="mt-6 flex justify-end space-x-4">
-      <button id="cancelEdit" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-        Cancel
-      </button>
-      <button id="saveConfig" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-        Save Configuration
-      </button>
+        <div class="mt-6 flex justify-end space-x-4">
+          <button type="button" id="cancelEdit" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+            Cancel
+          </button>
+          <button type="submit" id="saveConfig" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Save Configuration
+          </button>
+        </div>
+      </form>
     </div>
 
     <div id="message" class="mt-4 text-center font-bold"></div>
   </main>
 </Layout>
 
-<script is:inline define:vars={{ initialRules: rules }}>
-  window.currentRules = initialRules;
-</script>
-
 <script>
   import { initializeUI } from '../scripts/ui-initializer';
-  document.addEventListener('DOMContentLoaded', initializeUI);
+  import '../scripts/config-ui';
+
+  document.addEventListener('astro:page-load', initializeUI);
+</script>
+
+<script is:inline define:vars={{ initialRules: rules }}>
+  window.currentRules = initialRules;
 </script>

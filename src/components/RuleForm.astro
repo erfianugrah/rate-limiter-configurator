@@ -201,25 +201,34 @@ const requestMatch = rule.requestMatch || { conditions: [] };
 <script>
   import { initializeFormInteractivity, updateActionFields } from '../scripts/form-interactivity';
   import { addCondition, addConditionGroup, addConditionToGroup, removeCondition, removeConditionGroup } from '../scripts/rule-form-actions';
-  import { addFingerprint, removeFingerprint } from '../scripts/fingerprint-utils';
-  import { createOperator } from '../scripts/request-match-utils';
+  import { addFingerprint, removeFingerprint, updateFingerprintFields } from '../scripts/fingerprint-utils';
+  import { createOperator, updateConditionFields } from '../scripts/request-match-utils';
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     initializeFormInteractivity();
 
-document.querySelectorAll('[data-rule-index]').forEach(form => {
-  const index = (form as HTMLElement).dataset.ruleIndex;
-  if (index) {
-    const actionTypeSelect = form.querySelector(`[name="rules[${index}].action.type"]`) as HTMLSelectElement;
-    
-    actionTypeSelect.addEventListener('change', (e) => {
-      updateActionFields(parseInt(index), (e.target as HTMLSelectElement).value);
-    });
+    document.querySelectorAll('[data-rule-index]').forEach(form => {
+      const index = (form as HTMLElement).dataset.ruleIndex;
+      if (index) {
+        const actionTypeSelect = form.querySelector(`[name="rules[${index}].action.type"]`) as HTMLSelectElement;
+        
+        actionTypeSelect.addEventListener('change', (e) => {
+          updateActionFields(parseInt(index), (e.target as HTMLSelectElement).value);
+        });
 
-    // Initialize action fields
-    updateActionFields(parseInt(index), actionTypeSelect.value);
-  }
-});
+        // Initialize action fields
+        updateActionFields(parseInt(index), actionTypeSelect.value);
+
+        const fingerprintParamSelect = form.querySelector(`#fingerprintParam${index}`) as HTMLSelectElement;
+        
+        fingerprintParamSelect.addEventListener('change', () => {
+          updateFingerprintFields(parseInt(index));
+        });
+
+        // Initialize fingerprint fields
+        updateFingerprintFields(parseInt(index));
+      }
+    });
 
     // Make functions globally available
     window.addCondition = addCondition;
@@ -230,5 +239,6 @@ document.querySelectorAll('[data-rule-index]').forEach(form => {
     window.addFingerprint = addFingerprint;
     window.removeFingerprint = removeFingerprint;
     window.createOperator = createOperator;
+    window.updateConditionFields = updateConditionFields;
   });
 </script>

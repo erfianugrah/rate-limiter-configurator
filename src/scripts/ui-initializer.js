@@ -5,17 +5,18 @@ import { ADD_RULE_BUTTON_TEXT, MESSAGES } from './config-variables.js';
 export function initializeUI() {
   const addNewRuleBtn = document.getElementById('addNewRule');
   const ruleModals = document.getElementById('ruleModals');
+  const configFormContainer = document.getElementById('configFormContainer');
   const configForm = document.getElementById('configForm');
   const rulesContainer = document.getElementById('rulesContainer');
   const cancelEditBtn = document.getElementById('cancelEdit');
-  const saveConfigBtn = document.getElementById('saveConfig');
 
   addNewRuleBtn.textContent = ADD_RULE_BUTTON_TEXT;
 
   addNewRuleBtn.onclick = () => {
+    console.log('Add New Rule clicked'); // Debug log
     ruleModals.classList.add('hidden');
     addNewRuleBtn.classList.add('hidden');
-    configForm.classList.remove('hidden');
+    configFormContainer.classList.remove('hidden');
     rulesContainer.innerHTML = '';
     createRuleForm();
   };
@@ -23,20 +24,24 @@ export function initializeUI() {
   cancelEditBtn.onclick = () => {
     ruleModals.classList.remove('hidden');
     addNewRuleBtn.classList.remove('hidden');
-    configForm.classList.add('hidden');
+    configFormContainer.classList.add('hidden');
   };
 
-  saveConfigBtn.onclick = async () => {
+  configForm.onsubmit = async (e) => {
+    e.preventDefault();
     try {
       await saveConfiguration();
       updateRuleModals();
       ruleModals.classList.remove('hidden');
       addNewRuleBtn.classList.remove('hidden');
-      // configForm.classList.add('hidden');
+      configFormContainer.classList.add('hidden');
+      document.getElementById('message').textContent = MESSAGES.CONFIG_SAVED;
+      document.getElementById('message').className = 'mt-4 text-center font-bold text-green-600';
     } catch (error) {
-      const messageEl = document.getElementById('message');
-      messageEl.textContent = MESSAGES.SAVE_ERROR + error.message;
-      messageEl.className = 'mt-4 text-center font-bold text-red-600';
+      document.getElementById('message').textContent = MESSAGES.SAVE_ERROR + error.message;
+      document.getElementById('message').className = 'mt-4 text-center font-bold text-red-600';
     }
   };
+
+  console.log('UI initialized'); // Debug log
 }

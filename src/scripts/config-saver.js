@@ -1,5 +1,6 @@
 import { API_ENDPOINTS, MESSAGES } from './config-variables.js';
 
+// In config-saver.js
 export async function saveConfiguration() {
   try {
     // Update rule orders based on their current positions
@@ -13,12 +14,25 @@ export async function saveConfiguration() {
       body: JSON.stringify({ rules: window.currentRules }),
     });
 
+    const responseText = await response.text();
+    console.log('Raw server response:', responseText);
+
     if (!response.ok) {
-      throw new Error('Failed to save configuration');
+      throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
     }
 
-    document.getElementById('message').textContent = MESSAGES.CONFIG_SAVED;
-    document.getElementById('message').className = 'mt-4 text-center font-bold text-green-600';
+    let savedConfig;
+    try {
+      savedConfig = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Failed to parse response as JSON:', parseError);
+      throw new Error(`Server returned invalid JSON: ${responseText}`);
+    }
+
+    // Update window.currentRules with the response if needed
+    window.currentRules = savedConfig.rules || window.currentRules;
+
+    return savedConfig;
   } catch (error) {
     console.error('Error saving configuration:', error);
     throw error;

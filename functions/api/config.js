@@ -1,3 +1,4 @@
+// functions/api/config.js
 export async function onRequestGet(context) {
   const { env } = context;
   const configStorageId = env.CONFIG_STORAGE.idFromName('global');
@@ -15,10 +16,16 @@ export async function onRequestPost(context) {
   const configStorage = env.CONFIG_STORAGE.get(configStorageId);
 
   const config = await request.json();
-  await configStorage.fetch('https://rate-limiter-ui/config', {
+  const doResponse = await configStorage.fetch('https://rate-limiter-ui/config', {
     method: 'POST',
     body: JSON.stringify(config),
   });
 
-  return new Response('Config saved', { status: 200 });
+  const responseText = await doResponse.text();
+  console.log('Durable Object response:', responseText);
+
+  return new Response(responseText, {
+    status: doResponse.status,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }

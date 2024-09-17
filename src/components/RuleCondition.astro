@@ -85,24 +85,26 @@ const namePrefix = isGroupCondition
   import { updateConditionFields } from '../scripts/request-match-utils.js';
   import { removeCondition } from '../scripts/rule-form-actions.js';
 
-document.querySelectorAll('[name$=".field"]').forEach(select => {
-  select.addEventListener('change', (e) => {
-    const target = e.target as HTMLSelectElement;
-    const [ruleIndex, conditionIndex] = target.id.match(/\d+/g) || [];
-    if (ruleIndex && conditionIndex) {
-      updateConditionFields(target, parseInt(ruleIndex), conditionIndex);
-    }
-  });
-});
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll('[name$=".field"]').forEach(select => {
+      select.addEventListener('change', (e) => {
+        const target = e.target as HTMLSelectElement;
+        const [ruleIndex, conditionIndex] = target.id.match(/\d+/g) || [];
+        if (ruleIndex && conditionIndex) {
+          updateConditionFields(target, parseInt(ruleIndex), conditionIndex);
+        }
+      });
+    });
 
-document.querySelectorAll('[data-action="remove-condition"]').forEach(button => {
-  button.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement;
-    const ruleIndex = target.dataset.ruleIndex;
-    const conditionIndex = target.dataset.conditionIndex;
-    if (ruleIndex && conditionIndex) {
-      removeCondition(parseInt(ruleIndex), conditionIndex);
-    }
+    document.querySelectorAll('[data-action="remove-condition"]').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        const ruleIndex = target.dataset.ruleIndex;
+        const conditionIndex = target.dataset.conditionIndex;
+        if (ruleIndex && conditionIndex) {
+          removeCondition(parseInt(ruleIndex), conditionIndex);
+        }
+      });
+    });
   });
-});
 </script>
